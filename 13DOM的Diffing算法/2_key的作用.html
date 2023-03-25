@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2_key的作用</title>
+  </head>
+
+  <body>
+    <div id="test"></div>
+
+    <!-- end of the page -->
+    <script type="text/javascript" src="../js/react.development.js"></script>
+    <script
+      type="text/javascript"
+      src="../js/react-dom.development.js"
+    ></script>
+    <script type="text/javascript" src="../js/babel.min.js"></script>
+
+    <script type="text/babel">
+      /*
+      经典面试题：
+      1.react/vue中的key有什么作用，key的内部原理是什么？
+      2.为什么遍历列表时，key最好不要用index？
+
+      1.虚拟dom中key的作用
+        key是虚拟dom对象的标识，在更新显示时key起着极其重要的作用。
+        当状态中的数据发生变化时，react会根据新数据生成新的虚拟dom，随后新旧虚拟dom进行diff比较，比较规则如下
+        a.oldKey===newKey:
+          1.虚拟dom没变，直接使用之前的dom
+          2.虚拟dom变了，生成新的真实dom替换old真实dom
+        b.old虚拟dom中未找到与新虚拟dom相同的key
+          根据数据创建新的真实dom，随后渲染到页面
+
+      2.用index做key可能会引发的问题
+        a.若对数据进行：逆序添加，逆序删除等破坏顺序操作：会产生没有必要的真实dom更新---效果可以但没必要
+        b.如果结构中包含输入框----会产生错误dom更新，页面显示问题
+        c.注意：如果不存在对数据的逆序添加，逆序删除等破坏顺序操作，使用index做key是没问题的
+
+      3.开发如何选择key
+        a.最好选择每条数据的唯一标识作为key，比如id，手机号等唯一值
+        b.只是简单展示数据，用index也可以
+
+      */
+      //1.创建组件
+      class Person extends React.Component {
+        state = {
+          persons: [
+            {
+              id: 1,
+              name: "james",
+              age: 18,
+            },
+            {
+              id: 2,
+              name: "taylor",
+              age: 22,
+            },
+          ],
+        };
+        add = () => {
+          const { persons } = this.state;
+          const p = {
+            id: persons.length + 1,
+            name: "jay",
+            age: 22,
+          };
+          this.setState({ persons: [p, ...persons] });
+        };
+        render() {
+          return (
+            <div>
+              index
+              <ul>
+                {this.state.persons.map((o, i) => {
+                  return (
+                    <li key={i}>
+                      {o.name}--{o.age}
+                    </li>
+                  );
+                })}
+              </ul>
+              id
+              <ul>
+                {this.state.persons.map((o, i) => {
+                  return (
+                    <li key={o.id}>
+                      {o.name}--{o.age}
+                    </li>
+                  );
+                })}
+              </ul>
+              <button onClick={this.add}>来一个</button>
+            </div>
+          );
+        }
+      }
+      //2.渲染组件到页面
+      ReactDOM.render(<Person />, document.getElementById("test"));
+    </script>
+  </body>
+</html>
